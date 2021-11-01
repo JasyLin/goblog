@@ -29,36 +29,6 @@ func getArticleByID(id string) (Article, error) {
 	return article, err
 }
 
-func saveArticleToDB(title string, body string) (int64, error) {
-	var (
-		id int64
-		err error
-		rs sql.Result
-		stmt *sql.Stmt
-	)
-
-	stmt, err = db.Prepare("INSERT INTO articles (title, body) VALUES(?,?)")
-
-	if err != nil {
-		return 0, err
-	}
-
-	defer stmt.Close()
-
-	rs, err = stmt.Exec(title, body)
-
-	if err != nil {
-		return 0, err
-	}
-
-	if id, err = rs.LastInsertId(); id > 0 {
-		return id, nil
-	}
-
-	return 0, err
-}
-
-
 type Article struct {
 	Title, Body string
 	ID          int64
@@ -80,89 +50,12 @@ func (a Article) Delete() (rowsAffected int64, err error) {
 }
 
 
-func articlesIndexHandler(w http.ResponseWriter, r *http.Request) {
-	rows, err := db.Query("SELECT * from articles")
-	logger.LogError(err)
-	defer rows.Close()
-
-	var articles []Article
-
-	for rows.Next() {
-		var article Article
-		err := rows.Scan(&article.ID, &article.Title, &article.Body)
-		logger.LogError(err)
-		articles = append(articles, article)
-	}
-
-	err = rows.Err()
-	logger.LogError(err)
-
-	tmpl, err := template.ParseFiles("resources/views/articles/index.gohtml")
-	logger.LogError(err)
-
-	// 4. 渲染模板，将所有文章的数据传输进去
-	tmpl.Execute(w, articles)
-
-}
-
 type ArticlesFormData struct {
 	Title, Body string
 	URL         *url.URL
 	Errors      map[string]string
 }
 
-
-func articlesStoreHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.PostFormValue("title")
-	body := r.PostFormValue("body")
-
-	errors := validateArticleFormData(title, body)
-
-	// 检查是否有错误
-	if len(errors) == 0 {
-		lastInsertID, err := saveArticleToDB(title, body)
-		if lastInsertID > 0 {
-			fmt.Fprint(w, "插入成功， ID为" + strconv.FormatInt(lastInsertID, 10))
-		} else {
-			logger.LogError(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "500 服务器内部错误")
-		}
-	} else {
-		storeURL, _ := router.Get("articles.store").URL()
-
-		fmt.Println(storeURL)
-		data := ArticlesFormData{
-			Title:  title,
-			Body:   body,
-			URL:    storeURL,
-			Errors: errors,
-		}
-		tmpl, err := template.ParseFiles("resources/views/articles/create.gohtml")
-		if err != nil {
-			panic(err)
-		}
-
-		tmpl.Execute(w, data)
-	}
-}
-
-func articlesCreateHandler(w http.ResponseWriter, r *http.Request) {
-
-	storeURL, _ := router.Get("articles.store").URL()
-	data := ArticlesFormData{
-		Title:  "",
-		Body:   "",
-		URL:    storeURL,
-		Errors: nil,
-	}
-	tmpl, err := template.ParseFiles("resources/views/articles/create.gohtml")
-	if err != nil {
-		panic(err)
-	}
-
-	tmpl.Execute(w, data)
-}
 
 func articlesEditHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -345,8 +238,6 @@ func main() {
 
 
 
-	router.HandleFunc("/articles", articlesStoreHandler).Methods("POST").Name("articles.store")
-	router.HandleFunc("/articles/create", articlesCreateHandler).Methods("GET").Name("articles.create")
 	router.HandleFunc("/articles/{id:[0-9]+}/edit", articlesEditHandler).Methods("GET").Name("articles.edit")
 	router.HandleFunc("/articles/{id:[0-9]+}", articlesUpdateHandler).Methods("POST").Name("articles.update")
 	router.HandleFunc("/articles/{id:[0-9]+}/delete", articlesDeleteHandler).Methods("POST").Name("articles.delete")
