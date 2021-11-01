@@ -11,8 +11,8 @@
 
 {{/* 构建删除按钮 */}}
 {{ $idString := Int64ToString .ID }}
-<form action="{{ RouteName2URL "articles.delete" "id" $idString }}" method="post">
-    <button type="submit" onclick="confirm('删除动作不可逆，请确定是否继续')">删除</button>
+<form action="{{ RouteName2URL "articles.delete" "id" $idString}}" method="post">
+    <button type="submit" onclick="return confirm('删除动作不可逆，请确定是否继续')">删除</button>
 </form>
 
 </body>
