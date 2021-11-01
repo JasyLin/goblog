@@ -3,6 +3,7 @@ package model
 import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
 	"jasy/goblog/pkg/logger"
 )
 
@@ -15,7 +16,9 @@ func ConnectDB() *gorm.DB {
 		DSN: "root:w*$l#1tv4OSIOoJ1lxi%Eau4Ob5WuDIW@tcp(127.0.0.1:3306)/goblog?charset=utf8&parseTime=True&loc=Local",
 	})
 
-	DB, err = gorm.Open(config, &gorm.Config{})
+	DB, err = gorm.Open(config, &gorm.Config{
+		Logger: gormlogger.Default.LogMode(gormlogger.Warn),
+	})
 
 	logger.LogError(err)
 
