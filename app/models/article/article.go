@@ -1,16 +1,16 @@
 package article
 
 import (
+	"jasy/goblog/app/models"
 	"jasy/goblog/pkg/route"
-	"strconv"
 )
 
 type Article struct {
-	ID    int64
+	models.BaseModel
 	Title string
 	Body  string
 }
 
 func (a Article) Link() string {
-	return route.Name2URL("articles.show", "id", strconv.FormatInt(a.ID, 10))
+	return route.Name2URL("articles.show", "id", a.BaseModel.GetStringID())
 }
