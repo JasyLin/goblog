@@ -28,7 +28,7 @@ func RegisterWebRoutes(r *mux.Router) {
 	// 用户认证
 	auc := new(controllers.AuthController)
 	r.HandleFunc("/auth/register", auc.Register).Methods("GET").Name("auth.register")
-	r.HandleFunc("/auth/do-register", auc.DoRegister).Methods("POST").Name("auth.doregister")
+	r.HandleFunc("/auth/doregister", auc.DoRegister).Methods("POST").Name("auth.doregister")
 
 	// 静态资源
 	r.PathPrefix("/css/").Handler(http.FileServer(http.Dir("./public")))
