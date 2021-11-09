@@ -23,3 +23,12 @@ func StringToInt(str string) int {
 	}
 	return i
 }
+
+// StringToUint64 将字符串转换为 uint64
+func StringToUint64(str string) uint64 {
+	i, err := strconv.Atoi(str)
+	if err != nil {
+		logger.LogError(err)
+	}
+	return uint64(i)
+}
