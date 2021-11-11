@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io"
 	"jasy/goblog/pkg/auth"
+	"jasy/goblog/pkg/flash"
 	"jasy/goblog/pkg/logger"
 	"jasy/goblog/pkg/route"
 	"path/filepath"
@@ -27,6 +28,8 @@ func RenderSimple(w io.Writer, data D, tplFiles ...string) {
 func RenderTemplate(w io.Writer, name string, data D, tplFiles ...string) {
 
 	data["isLogined"] = auth.Check()
+	data["loginUser"] = auth.User()
+	data["flash"] = flash.All()
 
 	allFiles := getTemplateFiles(tplFiles...)
 
