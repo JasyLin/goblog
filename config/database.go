@@ -12,7 +12,7 @@ func init() {
 			"port":     config.Env("DB_PORT", "3306"),
 			"database": config.Env("DB_DATABASE", "goblog"),
 			"username": config.Env("DB_USERNAME", ""),
-			"password": "w*$l#1tv4OSIOoJ1lxi%Eau4Ob5WuDIW",
+			"password": config.Env("DB_PASSWORD", ""),
 			"charset":  "utf8mb4",
 
 			// 连接池配置
