@@ -5,6 +5,7 @@ import (
 	"jasy/goblog/app/models/article"
 	"jasy/goblog/app/policies"
 	"jasy/goblog/app/requests"
+	"jasy/goblog/pkg/auth"
 	"jasy/goblog/pkg/logger"
 	"jasy/goblog/pkg/route"
 	"jasy/goblog/pkg/view"
@@ -55,9 +56,11 @@ func (*ArticlesController) Create(w http.ResponseWriter, r *http.Request) {
 // Store 文章创建页面
 func (*ArticlesController) Store(w http.ResponseWriter, r *http.Request) {
 
+	currentUser := auth.User()
 	_article := article.Article{
 		Title: r.PostFormValue("title"),
 		Body:  r.PostFormValue("body"),
+		UserID: currentUser.ID,
 	}
 
 	errors := requests.ValidateArticleForm(_article)
