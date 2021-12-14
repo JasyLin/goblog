@@ -3,6 +3,7 @@ package view
 import (
 	"html/template"
 	"io"
+	"jasy/goblog/app/models/category"
 	"jasy/goblog/app/models/user"
 	"jasy/goblog/pkg/auth"
 	"jasy/goblog/pkg/flash"
@@ -32,6 +33,7 @@ func RenderTemplate(w io.Writer, name string, data D, tplFiles ...string) {
 	data["loginUser"] = auth.User()
 	data["flash"] = flash.All()
 	data["Users"], _ = user.All()
+	data["Categories"], _ = category.All()
 
 	allFiles := getTemplateFiles(tplFiles...)
 
